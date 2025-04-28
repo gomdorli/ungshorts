@@ -1,0 +1,13 @@
+python-telegram-bot
+requests
+APScheduler
+gspread
+google-auth
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+moviepy
+ffmpeg-python
+Pillow
+openai
+python-dotenv

@@ -1,0 +1,22 @@
+services:
+  - type: worker
+    name: youtube-shorts-bot
+    env: python
+    repo: https://github.com/your-username/your-repo-name
+    branch: main
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python main.py"
+    autoDeploy: true
+envVars:
+  - key: GOOGLE_API_KEY
+    value: ""
+  - key: YOUTUBE_API_KEY
+    value: ""
+  - key: TELEGRAM_BOT_TOKEN
+    value: ""
+  - key: SHEETS_ID
+    value: ""
+  - key: OPENAI_API_KEY
+    value: ""
+  - key: PEXELS_API_KEY
+    value: ""

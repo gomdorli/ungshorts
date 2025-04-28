@@ -12,3 +12,4 @@ Pillow
 openai
 python-dotenv
 pytrends
+gtts

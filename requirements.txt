@@ -11,4 +11,4 @@ ffmpeg-python
 Pillow
 openai
 python-dotenv
-**pytrends**
+pytrends

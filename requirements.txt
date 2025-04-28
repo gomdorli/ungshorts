@@ -13,3 +13,4 @@ openai
 python-dotenv
 pytrends
 gtts
+moviepy.editor

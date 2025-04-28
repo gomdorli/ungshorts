@@ -1,28 +1,46 @@
 # video/video_editor.py
 
 import os
-from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
-from moviepy.config import change_settings
-
-# 1. bin/ffmpeg 경로를 moviepy에 등록
-ffmpeg_path = os.path.join(os.getcwd(), 'bin', 'ffmpeg')
-change_settings({"FFMPEG_BINARY": ffmpeg_path})
+import subprocess
 
 def create_video_from_content(image_urls, audio_path, keyword):
-    clips = []
-    duration_per_image = 2  # 각 이미지당 2초씩 보여주기
+    if not image_urls:
+        raise ValueError("No images provided for video creation.")
+    
+    if not os.path.exists('output'):
+        os.makedirs('output')
+    
+    image_path = download_image(image_urls[0], keyword)
 
-    for url in image_urls:
-        img_clip = ImageClip(url).set_duration(duration_per_image).resize(height=1280).set_position("center")
-        clips.append(img_clip)
+    video_path = f"output/{keyword}_shorts.mp4"
 
-    video = concatenate_videoclips(clips, method="compose")
-    audio = AudioFileClip(audio_path)
-    final_video = video.set_audio(audio)
+    # ffmpeg 명령어로 이미지+오디오를 하나의 영상으로 합치기
+    ffmpeg_binary = os.path.join(os.getcwd(), 'bin', 'ffmpeg')
 
-    output_path = f"output/{keyword}_shorts.mp4"
+    command = [
+        ffmpeg_binary,
+        "-loop", "1",
+        "-i", image_path,
+        "-i", audio_path,
+        "-c:v", "libx264",
+        "-tune", "stillimage",
+        "-c:a", "aac",
+        "-b:a", "192k",
+        "-pix_fmt", "yuv420p",
+        "-shortest",
+        "-y",
+        video_path
+    ]
 
-    # 2. moviepy가 내부적으로 bin/ffmpeg를 사용해서 렌더링
-    final_video.write_videofile(output_path, fps=24)
+    subprocess.run(command, check=True)
 
-    return output_path
+    return video_path
+
+def download_image(url, keyword):
+    import requests
+
+    img_data = requests.get(url).content
+    image_path = f"output/{keyword}_thumbnail.jpg"
+    with open(image_path, 'wb') as handler:
+        handler.write(img_data)
+    return image_path

@@ -1,7 +1,7 @@
 from scheduler import start_scheduler
 from bot.telegram_bot import start_telegram_bot
 from utils.logger import setup_logger
-from uploader.sheets_logger import setup_sheets
+from uploader.sheets_logger import setup_sheets, log_to_sheets
 from stats.stats_manager import monitor_video_stats, send_weekly_report
 
 def main():

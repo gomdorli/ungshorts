@@ -6,6 +6,7 @@ from content.tts_generator import generate_tts_audio
 from video.video_editor import create_video_from_content
 from video.thumbnail_generator import create_thumbnail
 from uploader.youtube_uploader import upload_video_to_youtube
+from video_stats import monitor_video_stats  
 
 def automated_workflow():
     keywords = fetch_trending_keywords()
@@ -18,7 +19,7 @@ def automated_workflow():
 
 def start_scheduler():
     scheduler = BackgroundScheduler()
-    scheduler.add_job(automated_workflow, CronTrigger(hour=8, day='*/2'))  # 2일마다 오전 8시
+    scheduler.add_job(automated_workflow, CronTrigger(hour=8))
     scheduler.add_job(monitor_video_stats, CronTrigger(hour=9))
     scheduler.add_job(send_weekly_report, CronTrigger(day_of_week='mon', hour=10))
     scheduler.start()

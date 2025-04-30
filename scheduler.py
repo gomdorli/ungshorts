@@ -6,7 +6,7 @@ from content.tts_generator import generate_tts_audio
 from video.video_editor import create_video_from_content
 from video.thumbnail_generator import create_thumbnail
 from uploader.youtube_uploader import upload_video_to_youtube
-from video_stats import monitor_video_stats  
+from stats.stats_manager     import monitor_video_stats, send_weekly_report
 
 def automated_workflow():
     keywords = fetch_trending_keywords()

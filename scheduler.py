@@ -1,5 +1,8 @@
+# scheduler.py
+
 import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.base import STATE_RUNNING
 from apscheduler.triggers.cron import CronTrigger
 
 from stats.stats_manager import monitor_video_stats, send_weekly_report
@@ -16,7 +19,6 @@ scheduler = BackgroundScheduler(timezone=tz)
 # ———————————————————————————————
 
 def automated_workflow():
-    # 기존 자동화 작업 구현부
     keywords = fetch_trending_keywords()
     for kw in keywords:
         content = scrape_content_for_keywords(kw)
@@ -31,8 +33,8 @@ def automated_workflow():
 def start_scheduler():
     global scheduler
 
-    # 이미 실행 중이면 스킵
-    if scheduler.state == scheduler.STATE_RUNNING:
+    # 이미 실행 중인지 확인
+    if scheduler.state == STATE_RUNNING:
         print("[scheduler] already running, skipping start", flush=True)
         return
 

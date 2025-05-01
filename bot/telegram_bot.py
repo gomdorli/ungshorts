@@ -1,9 +1,9 @@
-# telegram/telegram_bot.py
 
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import os
 from content.tts_generator import generate_tts_audio
+from content.content_scraper import scrape_content_for_keywords
 from video.video_editor import create_video_from_content
 from uploader.youtube_uploader import upload_video_to_youtube
 from bot.telegram_notifier import send_message
@@ -20,13 +20,20 @@ def handle_message(update: Update, context: CallbackContext):
     print(f"[handle_message] Received keyword: {keyword}", flush=True)
     try:
         send_message(f"🎬 Generating video for: {keyword}")
-        audio_path = generate_tts_audio(f"A trending topic: {keyword}", keyword)
-        video_path = create_video_from_content([], audio_path, keyword)
+        
+        content = scrape_content_for_keywords(keyword)
+        images = content["images"]
+        if not images:
+            raise Exception("No images found for keyword")
+
+        audio_path = generate_tts_audio(content["summary"], keyword)
+        video_path = create_video_from_content(images, audio_path, keyword)
         video_id = upload_video_to_youtube(video_path, None, keyword, f"Shorts about {keyword}")
         msg = f"✅ Shorts uploaded!\nhttps://youtube.com/shorts/{video_id}"
         update.message.reply_text(msg)
         send_message(msg)
         print(f"[handle_message] Successfully uploaded video: {video_id}", flush=True)
+
     except Exception as e:
         update.message.reply_text("❌ Failed to create video.")
         send_message(f"❌ Error creating video for {keyword}: {e}")

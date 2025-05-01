@@ -1,4 +1,5 @@
 import os
+import time
 from scheduler import start_scheduler
 from bot.telegram_bot import start_telegram_bot
 from utils.logger import setup_logger
@@ -17,6 +18,12 @@ def main():
         start_telegram_bot()
     else:
         logger.info("Telegram bot is disabled.")
+    
+    logger.info("Keeping process alive to avoid restart.")
+    
+    # Render가 프로세스를 종료하지 않도록 대기 루프 유지
+    while True:
+        time.sleep(60)
 
 if __name__ == "__main__":
     main()

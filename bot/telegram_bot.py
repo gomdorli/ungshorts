@@ -39,12 +39,16 @@ def handle_message(update: Update, context: CallbackContext):
         send_message(f"❌ Error creating video for {keyword}: {e}")
         print(f"[handle_message] Error: {e}", flush=True)
 
+_started = False
+
 def start_telegram_bot():
+    global _started
+    if _started:
+        print("[telegram_bot] already running, skip", flush=True)
+        return
+
+    _started = True
     updater = Updater(TOKEN, use_context=True)
-    dp = updater.dispatcher
-
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_message))
-
+    # … 핸들러 등록 …
     updater.start_polling()
     updater.idle()

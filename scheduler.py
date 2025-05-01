@@ -24,10 +24,24 @@ def automated_workflow():
         upload_video_to_youtube(video_path, thumbnail_path, keyword, content['summary'])
 
 def start_scheduler():
-    # BackgroundScheduler에 서울 타임존 적용
-    scheduler = BackgroundScheduler(timezone=tz)
-    
-    scheduler.add_job(automated_workflow, CronTrigger(hour=8, timezone=tz))
-    scheduler.add_job(monitor_video_stats, CronTrigger(hour=9, timezone=tz))
-    scheduler.add_job(send_weekly_report, CronTrigger(day_of_week='mon', hour=10, timezone=tz))
+    # ② 이미 시작된 상태라면 아무것도 하지 않음
+    if scheduler.state == scheduler.STATE_RUNNING:
+        print("[scheduler] already running, skipping start", flush=True)
+        return
+
+    # ③ 잡을 add_job 할 때도 id를 붙여두면 중복 추가 방지
+    if not scheduler.get_job("automated_workflow"):
+        scheduler.add_job(automated_workflow,
+                          CronTrigger(hour=8, timezone=tz),
+                          id="automated_workflow")
+    if not scheduler.get_job("monitor_video_stats"):
+        scheduler.add_job(monitor_video_stats,
+                          CronTrigger(hour=9, timezone=tz),
+                          id="monitor_video_stats")
+    if not scheduler.get_job("send_weekly_report"):
+        scheduler.add_job(send_weekly_report,
+                          CronTrigger(day_of_week="mon", hour=10, timezone=tz),
+                          id="send_weekly_report")
+
     scheduler.start()
+    print("[scheduler] started with jobs:", [j.id for j in scheduler.get_jobs()], flush=True)

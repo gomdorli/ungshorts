@@ -13,11 +13,8 @@ def main():
     setup_sheets()
     start_scheduler()
 
-    if os.getenv("RUN_TELEGRAM_BOT", "false").lower() == "true":
-        logger.info("Telegram bot is starting...")
-        start_telegram_bot()
-    else:
-        logger.info("Telegram bot is disabled.")
+    logger.info("Telegram bot is starting...")
+    start_telegram_bot()
     
     logger.info("Keeping process alive to avoid restart.")
     

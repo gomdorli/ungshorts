@@ -11,7 +11,7 @@ TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 def start(update: Update, context: CallbackContext):
     update.message.reply_text('Send a topic and I will create a YouTube Shorts!')
-    print(f"Your Chat ID is: {update.message.chat_id}")
+    print(f"Your Chat ID is: {update.message.chat_id}", flush=True)
 
 def handle_message(update: Update, context: CallbackContext):
     keyword = update.message.text

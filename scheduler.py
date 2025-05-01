@@ -11,8 +11,10 @@ import pytz
 from apscheduler.triggers.date import DateTrigger
 import datetime
 
-# 타임존 설정 (Asia/Seoul)
+# —————————— 전역 스케줄러 선언 ——————————
 tz = pytz.timezone("Asia/Seoul")
+scheduler = BackgroundScheduler(timezone=tz)
+# ———————————————————————————————
 
 def automated_workflow():
     keywords = fetch_trending_keywords()
@@ -24,6 +26,8 @@ def automated_workflow():
         upload_video_to_youtube(video_path, thumbnail_path, keyword, content['summary'])
 
 def start_scheduler():
+    global scheduler
+    
     # ② 이미 시작된 상태라면 아무것도 하지 않음
     if scheduler.state == scheduler.STATE_RUNNING:
         print("[scheduler] already running, skipping start", flush=True)

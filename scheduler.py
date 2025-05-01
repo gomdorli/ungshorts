@@ -10,7 +10,7 @@ from stats.stats_manager     import monitor_video_stats, send_weekly_report
 from dateutil.tz import gettz
 
 # 타임존 설정 (Asia/Seoul)
-tz = gettz("Asia/Seoul")
+tz = pytz.timezone("Asia/Seoul")
 
 def automated_workflow():
     keywords = fetch_trending_keywords()

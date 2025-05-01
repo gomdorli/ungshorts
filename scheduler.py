@@ -7,6 +7,10 @@ from video.video_editor import create_video_from_content
 from video.thumbnail_generator import create_thumbnail
 from uploader.youtube_uploader import upload_video_to_youtube
 from stats.stats_manager     import monitor_video_stats, send_weekly_report
+from dateutil.tz import gettz
+
+# 타임존 설정 (Asia/Seoul)
+tz = gettz("Asia/Seoul")
 
 def automated_workflow():
     keywords = fetch_trending_keywords()
@@ -18,8 +22,10 @@ def automated_workflow():
         upload_video_to_youtube(video_path, thumbnail_path, keyword, content['summary'])
 
 def start_scheduler():
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(automated_workflow, CronTrigger(hour=8))
-    scheduler.add_job(monitor_video_stats, CronTrigger(hour=9))
-    scheduler.add_job(send_weekly_report, CronTrigger(day_of_week='mon', hour=10))
+    # BackgroundScheduler에 서울 타임존 적용
+    scheduler = BackgroundScheduler(timezone=tz)
+    
+    scheduler.add_job(automated_workflow, CronTrigger(hour=8, timezone=tz))
+    scheduler.add_job(monitor_video_stats, CronTrigger(hour=9, timezone=tz))
+    scheduler.add_job(send_weekly_report, CronTrigger(day_of_week='mon', hour=10, timezone=tz))
     scheduler.start()

@@ -7,7 +7,7 @@ from video.video_editor import create_video_from_content
 from video.thumbnail_generator import create_thumbnail
 from uploader.youtube_uploader import upload_video_to_youtube
 from stats.stats_manager     import monitor_video_stats, send_weekly_report
-from dateutil.tz import gettz
+import pytz
 
 # 타임존 설정 (Asia/Seoul)
 tz = pytz.timezone("Asia/Seoul")

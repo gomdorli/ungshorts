@@ -4,7 +4,8 @@ services:
     env: python
     repo: https://github.com/your-username/your-repo-name
     branch: main
-    buildCommand: "pip install -r requirements.txt"
+    buildCommand: "apt-get update && apt-get install -y ffmpeg \
+      && pip install -r requirements.txt"
     startCommand: "python main.py"
     autoDeploy: true
 envVars:

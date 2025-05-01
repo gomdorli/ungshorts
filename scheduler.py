@@ -31,8 +31,3 @@ def start_scheduler():
     scheduler.add_job(monitor_video_stats, CronTrigger(hour=9, timezone=tz))
     scheduler.add_job(send_weekly_report, CronTrigger(day_of_week='mon', hour=10, timezone=tz))
     scheduler.start()
-    
-    # (start_scheduler() 안에서)
-    #  └> 자동 스케줄러 시작 후
-    run_now = datetime.datetime.now(tz) + datetime.timedelta(seconds=5)
-    scheduler.add_job(automated_workflow, DateTrigger(run_date=run_now))

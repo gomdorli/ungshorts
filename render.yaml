@@ -1,24 +1,43 @@
 services:
+  - type: web
+    name: youtube-shorts-web
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+    - key: GOOGLE_API_KEY
+        value: ""
+      - key: YOUTUBE_API_KEY
+        value: ""
+      - key: TELEGRAM_BOT_TOKEN
+        value: ""
+      - key: SHEETS_ID
+        value: ""
+      - key: OPENAI_API_KEY
+        value: ""
+      - key: PEXELS_API_KEY
+        value: ""
+    
   - type: worker
-    name: youtube-shorts-bot
+    name: youtube-shorts-worker
     env: python
     repo: https://github.com/your-username/your-repo-name
     branch: main
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
       pip install -r requirements.txt
-    startCommand: "python main.py"
+    startCommand: python main.py
     autoDeploy: true
-envVars:
-  - key: GOOGLE_API_KEY
-    value: ""
-  - key: YOUTUBE_API_KEY
-    value: ""
-  - key: TELEGRAM_BOT_TOKEN
-    value: ""
-  - key: SHEETS_ID
-    value: ""
-  - key: OPENAI_API_KEY
-    value: ""
-  - key: PEXELS_API_KEY
-    value: ""
+    envVars:
+      - key: GOOGLE_API_KEY
+        value: ""
+      - key: YOUTUBE_API_KEY
+        value: ""
+      - key: TELEGRAM_BOT_TOKEN
+        value: ""
+      - key: SHEETS_ID
+        value: ""
+      - key: OPENAI_API_KEY
+        value: ""
+      - key: PEXELS_API_KEY
+        value: ""

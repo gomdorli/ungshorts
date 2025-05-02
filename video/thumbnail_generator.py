@@ -1,19 +1,18 @@
-# video/thumbnail_generator.py
-
-from PIL import Image, ImageDraw, ImageFont
 import os
+from PIL import Image, ImageDraw, ImageFont
+from shared.config import THUMBNAIL_OUTPUT_PATH
 
-def create_thumbnail(keyword):
-    if not os.path.exists('output'):
-        os.makedirs('output')
-    base = Image.new('RGB', (720, 1280), color=(255, 255, 255))
-    draw = ImageDraw.Draw(base)
-    
-    font = ImageFont.truetype("arial.ttf", 60)
-    text = f"{keyword}"
-    w, h = draw.textsize(text, font=font)
-    draw.text(((720 - w) / 2, (1280 - h) / 2), text, fill="black", font=font)
+# 썸네일 생성
 
-    thumbnail_path = f"output/{keyword}_thumbnail.jpg"
-    base.save(thumbnail_path)
-    return thumbnail_path
+def create_thumbnail(text, filename_prefix="thumb"):  
+    os.makedirs(THUMBNAIL_OUTPUT_PATH, exist_ok=True)
+    img = Image.new('RGB', (1280, 720), color=(255, 255, 255))
+    draw = ImageDraw.Draw(img)
+    try:
+        font = ImageFont.truetype("arial.ttf", 60)
+    except IOError:
+        font = ImageFont.load_default()
+    draw.text((50, 300), text, font=font, fill=(0, 0, 0))
+    path = os.path.join(THUMBNAIL_OUTPUT_PATH, f"{filename_prefix}.jpg")
+    img.save(path)
+    return path

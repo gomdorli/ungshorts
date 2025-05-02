@@ -1,5 +1,3 @@
-# content/content_scraper.py
-
 import os
 import requests
 from googletrans import Translator
@@ -26,8 +24,8 @@ def scrape_content_for_keywords(keyword):
     print(f"[content_scraper] Response body: {response.text[:200]}", flush=True)
 
     images = []
+    data = response.json() if response.status_code == 200 else {}
     if response.status_code == 200:
-        data = response.json()
         for photo in data.get('photos', []):
             images.append(photo['src']['original'])
 

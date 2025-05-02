@@ -1,16 +1,13 @@
-# stats/stats_manager.py
-
 import os
 import json
 import datetime
-import requests
-from telegram import Bot
 from googleapiclient.discovery import build
+from bot.telegram_notifier import send_message
+from shared.config import YOUTUBE_API_KEY, TELEGRAM_CHAT_ID
 
-TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # 따로 봇에 /start 해서 얻어야 함
-YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
-STATS_FILE = "video_stats.json"
+STATS_FILE = 'video_stats.json'
+
+# JSON 로드
 
 def load_stats():
     if os.path.exists(STATS_FILE):
@@ -18,45 +15,40 @@ def load_stats():
             return json.load(f)
     return {}
 
+# JSON 저장
 def save_stats(stats):
     with open(STATS_FILE, 'w') as f:
         json.dump(stats, f)
 
+# 영상별 조회수 모니터링
+
 def monitor_video_stats():
-    youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
     stats = load_stats()
-
-    for video_id, info in stats.items():
-        request = youtube.videos().list(part="statistics", id=video_id)
-        response = request.execute()
-
-        if 'items' in response and len(response['items']) > 0:
-            view_count = int(response['items'][0]['statistics']['viewCount'])
-            if view_count >= 100 and not info.get('notified'):
-                send_telegram_message(f"🔥 [조회수 100+] 영상 알림: https://youtube.com/shorts/{video_id} ({view_count} views)")
-                stats[video_id]['notified'] = True
-
+    youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
+    for vid, data in stats.items():
+        req = youtube.videos().list(part='statistics', id=vid)
+        res = req.execute()
+        views = int(res['items'][0]['statistics'].get('viewCount', 0))
+        if views >= 100 and data.get('last_views', 0) < 100:
+            send_message(TELEGRAM_CHAT_ID, f"🎉 https://youtu.be/{vid} 가 100뷰를 넘었습니다! 현재 조회수: {views}")
+        stats[vid]['last_views'] = views
     save_stats(stats)
+
+# 주간 보고서 발송
 
 def send_weekly_report():
     stats = load_stats()
-    weekly_views = []
-
-    for video_id, info in stats.items():
-        created_at = datetime.datetime.strptime(info['created_at'], "%Y-%m-%d")
-        if (datetime.datetime.now() - created_at).days <= 7:
-            weekly_views.append((video_id, info.get('views', 0)))
-
-    if weekly_views:
-        sorted_views = sorted(weekly_views, key=lambda x: x[1], reverse=True)
-        report = "📊 [YouTube Shorts 주간 통계]\n\n"
-        for vid, views in sorted_views[:5]:
-            report += f"- https://youtube.com/shorts/{vid} : {views} views\n"
+    week_ago = datetime.datetime.datetime.now() - datetime.timedelta(days=7)
+    weekly = []
+    for vid, data in stats.items():
+        upload_time = datetime.datetime.datetime.fromisoformat(data['upload_time'])
+        if upload_time >= week_ago:
+            weekly.append((vid, data.get('last_views', 0)))
+    if weekly:
+        weekly.sort(key=lambda x: x[1], reverse=True)
+        msg = "📊 [주간 통계]\n"
+        for vid, views in weekly[:5]:
+            msg += f"- https://youtu.be/{vid} : {views} views\n"
     else:
-        report = "📊 이번 주에는 새로운 영상 활동이 없습니다."
-
-    send_telegram_message(report)
-
-def send_telegram_message(text):
-    bot = Bot(token=TELEGRAM_TOKEN)
-    bot.send_message(chat_id=CHAT_ID, text=text)
+        msg = "📊 이번 주에 새로 업로드된 영상이 없습니다."
+    send_message(TELEGRAM_CHAT_ID, msg)

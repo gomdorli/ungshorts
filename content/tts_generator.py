@@ -1,12 +1,12 @@
-# content/tts_generator.py
-
-from gtts import gTTS
 import os
+from gtts import gTTS
+from shared.config import AUDIO_OUTPUT_PATH
 
-def generate_tts_audio(text, keyword):
-    if not os.path.exists('output'):
-        os.makedirs('output')
-    filename = f"output/{keyword}_audio.mp3"
-    tts = gTTS(text=text, lang='en')
-    tts.save(filename)
-    return filename
+# 텍스트를 음성으로 변환
+
+def generate_tts_audio(text, filename_prefix="tts"):  
+    os.makedirs(AUDIO_OUTPUT_PATH, exist_ok=True)
+    tts = gTTS(text=text, lang='ko')
+    audio_path = os.path.join(AUDIO_OUTPUT_PATH, f"{filename_prefix}.mp3")
+    tts.save(audio_path)
+    return audio_path

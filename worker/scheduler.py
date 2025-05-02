@@ -1,17 +1,21 @@
 # scheduler.py
 
+import os
 import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.schedulers.base import STATE_RUNNING
 from apscheduler.triggers.cron import CronTrigger
-
-from stats.stats_manager import monitor_video_stats, send_weekly_report
 from keywords.keyword_fetcher import fetch_trending_keywords
 from content.content_scraper import scrape_content_for_keywords
 from content.tts_generator import generate_tts_audio
-from video.video_editor import create_video_from_content
 from video.thumbnail_generator import create_thumbnail
+from video.video_editor import create_video_from_content
 from uploader.youtube_uploader import upload_video_to_youtube
+from uploader.sheets_logger import log_to_sheets
+from stats.stats_manager import monitor_video_stats, send_weekly_report
+from utils.logger import setup_logger
+from shared.config import TIMEZONE
+
+logger = setup_logger()
 
 # —————————— 전역 스케줄러 선언 ——————————
 tz = pytz.timezone("Asia/Seoul")
@@ -21,14 +25,15 @@ scheduler = BackgroundScheduler(timezone=tz)
 def automated_workflow():
     keywords = fetch_trending_keywords()
     for kw in keywords:
-        content = scrape_content_for_keywords(kw)
-        images = content["images"]
-        summary = content["summary"]
-        if not images:
-            continue
-        audio_path = generate_tts_audio(summary, kw)
-        video_path = create_video_from_content(images, audio_path, kw)
-        upload_video_to_youtube(video_path, None, kw, f"Shorts about {kw}")
+        logger.info(f"Scheduled job: processing '{kw}'...")
+        summary = scrape_content_for_keywords(kw)
+        audio = generate_tts_audio(summary, kw)
+        thumb = create_thumbnail(kw)
+        video = create_video_from_content(summary, audio, thumb, kw)
+        vid = upload_video_to_youtube(video, f"{kw} - Shorts", summary, thumb)
+        url = f"https://youtu.be/{vid}"
+        log_to_sheets(kw, summary, url)
+        logger.info(f"Uploaded {url}")
 
 def start_scheduler():
     global scheduler
@@ -45,12 +50,15 @@ def start_scheduler():
             CronTrigger(hour=8, timezone=tz),
             id="automated_workflow"
         )
+    # 매일 오후 3시 조회수 모니터링
     if not scheduler.get_job("monitor_video_stats"):
         scheduler.add_job(
             monitor_video_stats,
-            CronTrigger(hour=9, timezone=tz),
+            CronTrigger(hour=15, timezone=tz),
             id="monitor_video_stats"
         )
+        
+    # 매주 월요일 오전 10시 주간 보고
     if not scheduler.get_job("send_weekly_report"):
         scheduler.add_job(
             send_weekly_report,
@@ -59,4 +67,4 @@ def start_scheduler():
         )
 
     scheduler.start()
-    print("[scheduler] started with jobs:", [j.id for j in scheduler.get_jobs()], flush=True)
+    logger.info(f"Scheduler started with jobs: {[j.id for j in scheduler.get_jobs()]}")

@@ -1,54 +1,59 @@
-
+import os
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
-import os
-from content.tts_generator import generate_tts_audio
+from keywords.keyword_fetcher import fetch_trending_keywords
 from content.content_scraper import scrape_content_for_keywords
+from content.tts_generator import generate_tts_audio
+from video.thumbnail_generator import create_thumbnail
 from video.video_editor import create_video_from_content
 from uploader.youtube_uploader import upload_video_to_youtube
+from uploader.sheets_logger import log_to_sheets
 from bot.telegram_notifier import send_message
+from utils.logger import setup_logger
 
-TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+# 로거
+logger = setup_logger()
 
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+
+# /start 핸들러
 def start(update: Update, context: CallbackContext):
-    update.message.reply_text('Send a topic and I will create a YouTube Shorts!')
-    print(f"Your Chat ID is: {update.message.chat_id}", flush=True)
+    update.message.reply_text("안녕하세요! 주제를 보내주시면 유튜브 쇼츠를 생성합니다.")
+    logger.info(f"New chat: {update.message.chat_id}")
 
-def handle_message(update: Update, context: CallbackContext):
-    print("[handle_message] Triggered", flush=True)
-    keyword = update.message.text
-    print(f"[handle_message] Received keyword: {keyword}", flush=True)
-    try:
-        send_message(f"🎬 Generating video for: {keyword}")
-        
-        content = scrape_content_for_keywords(keyword)
-        images = content["images"]
-        if not images:
-            raise Exception("No images found for keyword")
+# 텍스트 메시지 핸들러
 
-        audio_path = generate_tts_audio(content["summary"], keyword)
-        video_path = create_video_from_content(images, audio_path, keyword)
-        video_id = upload_video_to_youtube(video_path, None, keyword, f"Shorts about {keyword}")
-        msg = f"✅ Shorts uploaded!\nhttps://youtube.com/shorts/{video_id}"
-        update.message.reply_text(msg)
-        send_message(msg)
-        print(f"[handle_message] Successfully uploaded video: {video_id}", flush=True)
+def handle_topic(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    topic = update.message.text.strip()
+    send_message(chat_id, f"'{topic}' 주제로 쇼츠 영상을 생성합니다...")
 
-    except Exception as e:
-        update.message.reply_text("❌ Failed to create video.")
-        send_message(f"❌ Error creating video for {keyword}: {e}")
-        print(f"[handle_message] Error: {e}", flush=True)
+    # 1) 콘텐츠 요약
+    summary = scrape_content_for_keywords(topic)
+    # 2) TTS 오디오 생성
+    audio_path = generate_tts_audio(summary, topic)
+    # 3) 썸네일 생성
+    thumbnail_path = create_thumbnail(topic)
+    # 4) 영상 생성
+    video_path = create_video_from_content(summary, audio_path, thumbnail_path, topic)
+    # 5) 유튜브 업로드
+    video_id = upload_video_to_youtube(video_path, f"{topic} - Shorts", summary, thumbnail_path)
+    video_url = f"https://youtu.be/{video_id}"
+    # 6) Google Sheets에 기록
+    log_to_sheets(topic, summary, video_url)
+    # 7) 완료 메시지
+    send_message(chat_id, f"완료! 영상 링크: {video_url}")
+    logger.info(f"Uploaded video {video_url} for topic '{topic}'")
 
-_started = False
+# 핸들러 등록 함수
+def register_handlers(dispatcher):
+    dispatcher.add_handler(CommandHandler("start", start))
+    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_topic))
 
+# 봇 시작 함수
 def start_telegram_bot():
-    global _started
-    if _started:
-        print("[telegram_bot] already running, skip", flush=True)
-        return
-
-    _started = True
-    updater = Updater(TOKEN, use_context=True)
-    # … 핸들러 등록 …
+    updater = Updater(TELEGRAM_BOT_TOKEN, use_context=True)
+    dp = updater.dispatcher
+    register_handlers(dp)
     updater.start_polling()
     updater.idle()

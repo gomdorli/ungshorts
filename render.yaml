@@ -2,8 +2,11 @@ services:
   - type: web
     name: youtube-shorts-web
     runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    buildCommand: |
+      apt-get update && apt-get install -y ffmpeg
+      pip install moviepy
+      pip install -r ../requirements.txt
+    startCommand: python -m webserver.app
     envVars:
     - key: GOOGLE_API_KEY
         value: ""
@@ -26,7 +29,7 @@ services:
     buildCommand: |
       apt-get update && apt-get install -y ffmpeg
       pip install -r requirements.txt
-    startCommand: python main.py
+    startCommand: python -m worker.main
     autoDeploy: true
     envVars:
       - key: GOOGLE_API_KEY

@@ -18,7 +18,8 @@ def webhook():
     return "OK"
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 8443))
+    # 외부에 공개하는 URL은 443 포트를 쓰도록(포트 표기는 하지 않음)
+    port = int(os.environ.get('PORT', 10000))
     updater.start_webhook(
         listen='0.0.0.0',
         port=port,

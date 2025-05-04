@@ -10,7 +10,6 @@ requests
 pytrends
 gtts
 Pillow
-moviepy
 
 # Google & YouTube
 gspread
@@ -20,4 +19,4 @@ google-auth-oauthlib
 google-api-python-client
 
 googletrans==4.0.0-rc1
-moviepy>=2.0.0
+imageio-ffmpeg>=0.10.0

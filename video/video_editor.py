@@ -1,5 +1,4 @@
 import os
-from moviepy.editor import ImageClip, AudioFileClip
 from shared.config import VIDEO_OUTPUT_PATH
 
 # 영상 생성 (썸네일 + 오디오)

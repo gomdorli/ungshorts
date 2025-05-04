@@ -22,3 +22,7 @@ VIDEO_OUTPUT_PATH = os.getenv("VIDEO_OUTPUT_PATH", "output/videos/")
 
 # 스케줄 타임존
 TIMEZONE = os.getenv("TIMEZONE", "Asia/Seoul")
+
+# 서비스의 공개 도메인(URL)
+# 예: https://your-app-name.onrender.com
+DOMAIN = os.getenv("DOMAIN", "https://ungshorts-8m6e.onrender.com")

@@ -3,6 +3,7 @@
 import os
 import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.base import STATE_RUNNING
 from apscheduler.triggers.cron import CronTrigger
 from keywords.keyword_fetcher import fetch_trending_keywords
 from content.content_scraper import scrape_content_for_keywords

@@ -7,17 +7,23 @@ from shared.config import TELEGRAM_BOT_TOKEN, TIMEZONE, DOMAIN
 
 app = Flask(__name__)
 updater = Updater(TELEGRAM_BOT_TOKEN, use_context=True)
-dp = updater.dispatcher
-register_handlers(dp)
+register_handlers(updater.dispatcher)
 
-@app.route(f"/{TELEGRAM_BOT_TOKEN}", methods=["POST"])
+WEBHOOK_PATH = f"/{TELEGRAM_BOT_TOKEN}"
+# 실제로 외부에서 보이는 URL (포트 없음)
+WEBHOOK_URL  = f"https://{DOMAIN}{WEBHOOK_PATH}"
+
+# Render가 할당해 주는 내부 포트 (예: 10000)
+port = int(os.environ.get("PORT", 10000))
+
+@app.route(WEBHOOK_PATH, methods=["POST"])
 def webhook():
     data = request.get_json(force=True)
     update = Update.de_json(data, updater.bot)
     updater.bot.process_update(update)
     return "OK"
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # 1) webhook_url 파라미터로 외부 URL 지정
     # 2) 내부 포트를 10000(또는 PORT)에 매핑
     updater.start_webhook(

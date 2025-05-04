@@ -18,12 +18,13 @@ def webhook():
     return "OK"
 
 if __name__ == '__main__':
-    # 외부에 공개하는 URL은 443 포트를 쓰도록(포트 표기는 하지 않음)
-    port = int(os.environ.get('PORT', 10000))
+    # 1) webhook_url 파라미터로 외부 URL 지정
+    # 2) 내부 포트를 10000(또는 PORT)에 매핑
     updater.start_webhook(
-        listen='0.0.0.0',
+        listen="0.0.0.0",
         port=port,
-        url_path=TELEGRAM_BOT_TOKEN
+        url_path=TELEGRAM_BOT_TOKEN,
+        webhook_url=WEBHOOK_URL,
     )
-    updater.bot.setWebhook(f"https://{os.getenv('DOMAIN')}/{TELEGRAM_BOT_TOKEN}")
-    app.run(host='0.0.0.0', port=port)
+    # Flask 앱도 동일 포트에서 실행
+    app.run(host="0.0.0.0", port=port)

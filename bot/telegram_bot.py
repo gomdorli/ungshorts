@@ -25,25 +25,42 @@ def start(update: Update, context: CallbackContext):
 
 def handle_topic(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
-    topic = update.message.text.strip()
+    topic = update.message.text
     send_message(chat_id, f"'{topic}' 주제로 쇼츠 영상을 생성합니다...")
 
-    # 1) 콘텐츠 요약
-    summary = scrape_content_for_keywords(topic)
-    # 2) TTS 오디오 생성
-    audio_path = generate_tts_audio(summary, topic)
-    # 3) 썸네일 생성
-    thumbnail_path = create_thumbnail(topic)
-    # 4) 영상 생성
-    video_path = create_video_from_content(summary, audio_path, thumbnail_path, topic)
-    # 5) 유튜브 업로드
-    video_id = upload_video_to_youtube(video_path, f"{topic} - Shorts", summary, thumbnail_path)
-    video_url = f"https://youtu.be/{video_id}"
-    # 6) Google Sheets에 기록
-    log_to_sheets(topic, summary, video_url)
-    # 7) 완료 메시지
-    send_message(chat_id, f"완료! 영상 링크: {video_url}")
-    logger.info(f"Uploaded video {video_url} for topic '{topic}'")
+    try:
+        # 1) 콘텐츠 요약
+        summary = scrape_content_for_keywords(topic)
+        images = contents["images"]
+        if not images:
+            raise Exception("No images found for keyword")
+            
+        summary = content["summary"]
+        print(f"[handle_topic] Using summary: {summary}", flush=True)  # 디버깅 로그
+        
+        # 2) TTS 오디오 생성    
+        audio_path = generate_tts_audio(summary, topic)
+        
+        # 3) 썸네일 생성
+        thumbnail_path = create_thumbnail(topic)
+        
+        # 4) 영상 생성
+        video_path = create_video_from_content(images, audio_path, thumbnail_path, topic)
+        
+        # 5) 유튜브 업로드
+        video_id = upload_video_to_youtube(video_path, f"{topic} - Shorts", summary, thumbnail_path)
+        video_url = f"https://youtu.be/{video_id}"
+        
+        # 6) Google Sheets에 기록
+        log_to_sheets(topic, summary, video_url)
+        
+        # 7) 완료 메시지
+        send_message(chat_id, f"완료! 영상 링크: {video_url}")
+        logger.info(f"Uploaded video {video_url} for topic '{topic}'")
+    except Exception as e:
+        update.message.reply_text("❌ Failed to create video.")
+        send_message(f"❌ Error creating video for {topic}: {e}")
+        print(f"[handle_topic] Error: {e}", flush=True)
 
 # 핸들러 등록 함수
 def register_handlers(dispatcher):

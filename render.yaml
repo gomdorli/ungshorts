@@ -3,7 +3,7 @@ services:
     name: youtube-shorts-web
     runtime: python
     buildCommand: pip install -r webserver/requirements.txt
-    startCommand: python -m webserver.app
+    startCommand: gunicorn webserver.app:app --bind 0.0.0.0:$PORT
     envVars:
     - key: GOOGLE_API_KEY
         value: ""

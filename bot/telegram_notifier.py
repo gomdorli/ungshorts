@@ -1,3 +1,4 @@
+import os
 from telegram import Bot
 from shared.config import TELEGRAM_BOT_TOKEN
 

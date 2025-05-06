@@ -26,7 +26,7 @@ def start(update: Update, context: CallbackContext):
 def handle_topic(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     topic = update.message.text
-    send_message(chat_id, f"'{topic}' 주제로 쇼츠 영상을 생성합니다...")
+    send_message(f"'{topic}' 주제로 쇼츠 영상을 생성합니다...")
 
     try:
         # 1) 콘텐츠 요약
@@ -55,7 +55,7 @@ def handle_topic(update: Update, context: CallbackContext):
         log_to_sheets(topic, summary, video_url)
         
         # 7) 완료 메시지
-        send_message(chat_id, f"완료! 영상 링크: {video_url}")
+        send_message(f"완료! 영상 링크: {video_url}")
         logger.info(f"Uploaded video {video_url} for topic '{topic}'")
     except Exception as e:
         update.message.reply_text("❌ Failed to create video.")

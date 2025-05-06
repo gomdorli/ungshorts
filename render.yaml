@@ -2,7 +2,7 @@ services:
   - type: web
     name: youtube-shorts-web
     runtime: python
-    buildCommand: pip install moviepy | pip install -r ../requirements.txt
+    buildCommand: python3 -m pip install moviepy && python3 -m pip install -r requirements.txt
     startCommand: gunicorn webserver.app:app --bind 0.0.0.0:$PORT
     envVars:
     - key: GOOGLE_API_KEY
@@ -23,7 +23,7 @@ services:
     env: python
     repo: https://github.com/your-username/your-repo-name
     branch: main
-    buildCommand: pip install moviepy && pip install -r ../requirements.txt
+    buildCommand: python3 -m pip install moviepy && python3 -m pip install -r requirements.txt
     startCommand: python -m worker.main
     autoDeploy: true
     envVars:

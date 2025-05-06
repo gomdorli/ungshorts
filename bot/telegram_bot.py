@@ -30,12 +30,12 @@ def handle_topic(update: Update, context: CallbackContext):
 
     try:
         # 1) 콘텐츠 요약
-        contents = scrape_content_for_keywords(topic)
-        images = contents["images"]
+        content = scrape_content_for_keywords(topic)
+        images = content["images"]
         if not images:
             raise Exception("No images found for keyword")
             
-        summary = contents["summary"]
+        summary = content["summary"]
         print(f"[handle_topic] Using summary: {summary}", flush=True)  # 디버깅 로그
         
         # 2) TTS 오디오 생성    

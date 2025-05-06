@@ -1,5 +1,6 @@
 import os
 from shared.config import VIDEO_OUTPUT_PATH
+from moviepy.editor import ImageClip, AudioFileClip
 
 # 영상 생성 (썸네일 + 오디오)
 def create_video_from_content(text, audio_path, thumbnail_path, filename_prefix="video"):  

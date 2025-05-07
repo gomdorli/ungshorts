@@ -1,6 +1,12 @@
 import os
 from shared.config import VIDEO_OUTPUT_PATH
-from moviepy.editor import ImageClip, AudioFileClip
+try:
+    # 정상적인 경우, editor.py가 있으면 이 구문이 동작합니다.
+    from moviepy.editor import ImageClip, AudioFileClip
+except ImportError:
+    # editor.py가 없을 때는 각 모듈에서 직접 import
+    from moviepy.Clip import ImageClip
+    from moviepy.audio.AudioFileClip import AudioFileClip
 
 # 영상 생성 (썸네일 + 오디오)
 def create_video_from_content(text, audio_path, thumbnail_path, filename_prefix="video"):  

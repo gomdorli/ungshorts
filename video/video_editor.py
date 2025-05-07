@@ -5,8 +5,8 @@ try:
     from moviepy.editor import ImageClip, AudioFileClip
 except ImportError:
     # editor.py가 없을 때는 각 모듈에서 직접 import
-    from moviepy.Clip import ImageClip
-    from moviepy.audio.AudioFileClip import AudioFileClip
+    from moviepy.video.VideoClip import ImageClip
+    from moviepy.audio.io.AudioFileClip import AudioFileClip
 
 # 영상 생성 (썸네일 + 오디오)
 def create_video_from_content(text, audio_path, thumbnail_path, filename_prefix="video"):  

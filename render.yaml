@@ -3,7 +3,7 @@ services:
     name: youtube-shorts-web
     runtime: python
     buildCommand: python3 -m pip install -r requirements.txt
-    startCommand: .venv/bin/gunicorn webserver.app:app --bind 0.0.0.0:$PORT
+    startCommand: gunicorn webserver.app:app --bind 0.0.0.0:$PORT
     envVars:
     - key: GOOGLE_API_KEY
         value: ""
@@ -24,7 +24,7 @@ services:
     repo: https://github.com/your-username/your-repo-name
     branch: main
     buildCommand: python3 -m pip install -r requirements.txt
-    startCommand: .venv/bin/python3 -m worker.main
+    startCommand: python3 -m worker.main
     autoDeploy: true
     envVars:
       - key: GOOGLE_API_KEY

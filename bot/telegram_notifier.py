@@ -15,7 +15,7 @@ def send_message(arg1, arg2=None):
         chat_id = arg1
         text    = arg2
 
-    if not BOT_TOKEN or not chat_id:
+    if not TELEGRAM_BOT_TOKEN or not chat_id:
         print("Telegram bot token or chat ID is not set.", flush=True)
         return
 

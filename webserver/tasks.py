@@ -45,5 +45,5 @@ def process_video_job(topic: str, chat_id: str):
         # 7) 완료 알림
         send_message(chat_id, f"✅ 완료! 영상 링크: {video_url}")
     except Exception as e:
+        # 1회 실패로만 처리하고, 재시도하지 않도록 raise 제거
         send_message(chat_id, f"❌ 쇼츠 생성 실패: {e}")
-        raise  # 로그에도 남기기

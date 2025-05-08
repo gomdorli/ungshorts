@@ -3,7 +3,7 @@ from flask import Flask, request
 from telegram import Bot, Update
 from telegram.ext import Dispatcher
 from bot.telegram_bot import register_handlers
-from tasks import enqueue_video_job
+from webserver.tasks import enqueue_video_job
 from shared.config import TELEGRAM_BOT_TOKEN, DOMAIN
 
 # 환경 변수

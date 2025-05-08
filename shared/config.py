@@ -26,3 +26,5 @@ TIMEZONE = os.getenv("TIMEZONE", "Asia/Seoul")
 # 서비스의 공개 도메인(URL)
 # 예: https://your-app-name.onrender.com
 DOMAIN = os.getenv("DOMAIN", "https://ungshorts-8m6e.onrender.com")
+
+REDIS_URL         = os.getenv("REDIS_URL", "redis://localhost:6379/0")

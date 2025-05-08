@@ -3,7 +3,7 @@ from flask import Flask, request
 from telegram import Bot, Update
 from telegram.ext import Dispatcher
 from bot.telegram_bot import register_handlers
-from webserver.tasks import enqueue_video_job
+from webserver.tasks import process_video_job
 from shared.config import TELEGRAM_BOT_TOKEN, DOMAIN
 
 # 환경 변수
@@ -31,7 +31,7 @@ def webhook():
     #    (handle_topic 내부 말고, telegram_notifier로 chat_id까지 파싱해서)
     topic   = update.message.text
     chat_id = update.message.chat_id
-    enqueue_video_job(topic, chat_id)
+    threading.Thread(target=process_video_job, args=(topic, chat_id), daemon=True).start()
     return "OK"
 
 # 앱 로드시 한 번만 Webhook 등록

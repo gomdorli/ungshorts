@@ -25,4 +25,6 @@ def upload_video_to_youtube(video_path, title, description, thumbnail_path=None)
             videoId=video_id,
             media_body=MediaFileUpload(thumbnail_path)
         ).execute()
+    else:
+        print(f"[WARN] thumbnail_path is None, skipping thumbnail upload", flush=True)
     return video_id

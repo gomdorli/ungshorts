@@ -2,10 +2,17 @@ import os
 from PIL import Image, ImageDraw, ImageFont
 from shared.config import THUMBNAIL_OUTPUT_PATH
 
-# 썸네일 생성
+def create_thumbnail(text, filename_prefix=None):
+    # 1) THUMBNAIL_OUTPUT_PATH 기본값 보장
+    base = THUMBNAIL_OUTPUT_PATH or os.path.join(os.getcwd(), "thumbnails")
+    os.makedirs(base, exist_ok=True)
 
-def create_thumbnail(text, filename_prefix="thumb"):  
-    os.makedirs(THUMBNAIL_OUTPUT_PATH, exist_ok=True)
+    # 2) 파일명에 한글 공백 섞이지 않게
+    prefix = filename_prefix or text
+    safe_prefix = "".join(c if c.isalnum() else "_" for c in prefix)
+
+    path = os.path.join(base, f"{safe_prefix}.jpg")
+
     img = Image.new('RGB', (1280, 720), color=(255, 255, 255))
     draw = ImageDraw.Draw(img)
     try:
@@ -13,6 +20,7 @@ def create_thumbnail(text, filename_prefix="thumb"):
     except IOError:
         font = ImageFont.load_default()
     draw.text((50, 300), text, font=font, fill=(0, 0, 0))
-    path = os.path.join(THUMBNAIL_OUTPUT_PATH, f"{filename_prefix}.jpg")
+
+    # 3) 절대 경로로 세이브 & 반환
     img.save(path)
-    return path
+    return os.path.abspath(path)

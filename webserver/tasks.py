@@ -17,7 +17,14 @@ def process_video_job(topic: str, chat_id: str):
         audio     = generate_tts_audio(summary, topic)
         thumbnail = create_thumbnail(topic)
         video     = create_video_from_content(images, audio, thumbnail, topic)
-        vid_id    = upload_video_to_youtube(video, f"{topic} - Shorts", summary, thumbnail)
+        
+        print(f"[DEBUG] video = {video!r}", flush=True)
+        print(f"[DEBUG] thumbnail = {thumbnail!r}", flush=True)
+
+        if thumbnail:
+            vid_id    = upload_video_to_youtube(video, f"{topic} - Shorts", summary, thumbnail)
+        else:
+            vid_id    = upload_video_to_youtube(video, f"{topic} - Shorts", summary)
         url       = f"https://youtu.be/{vid_id}"
         log_to_sheets(topic, summary, url)
         send_message(chat_id, f"✅ 완료! 영상 링크: {url}")

@@ -1,4 +1,5 @@
 import os
+import threading
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 from keywords.keyword_fetcher import fetch_trending_keywords
@@ -10,6 +11,7 @@ from uploader.youtube_uploader import upload_video_to_youtube
 from uploader.sheets_logger import log_to_sheets
 from bot.telegram_notifier import send_message
 from utils.logger import setup_logger
+from webserver.tasks import process_video_job
 
 # 로거
 logger = setup_logger()
@@ -19,10 +21,35 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 # /start 핸들러
 def start(update: Update, context: CallbackContext):
     update.message.reply_text("안녕하세요! 주제를 보내주시면 유튜브 쇼츠를 생성합니다.")
-    logger.info(f"New chat: {update.message.chat_id}")
 
+# /generate <주제> 핸들러
+def generate(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    topic = ' '.join(context.args)
+    if not topic:
+        return update.message.reply_text("사용법: /generate <주제>")
+
+    update.message.reply_text(f"🎬 ‘{topic}’ 영상 생성 시작...")
+    threading.Thread(target=process_video_job, args=(topic, chat_id), daemon=True).start()
+
+# /trending 핸들러: 상위 키워드 가져와 영상 자동 생성
+def trending(update: Update, context: CallbackContext):
+    chat_id = update.message.chat_id
+    update.message.reply_text("🔍 상위 트렌딩 키워드를 가져오는 중입니다...")
+    keywords = fetch_trending_keywords()
+    if not keywords:
+        return update.message.reply_text("❌ 트렌딩 키워드를 가져오지 못했습니다.")
+
+    # 예시: 상위 5개 키워드
+    top_n = 5
+    selected = keywords[:top_n]
+    update.message.reply_text(f"📈 상위 {top_n}개 키워드: {', '.join(selected)}")
+
+    for topic in selected:
+        update.message.reply_text(f"🎬 ‘{topic}’ 영상 생성 시작...")
+        threading.Thread(target=process_video_job, args=(topic, chat_id), daemon=True).start()
+        
 # 텍스트 메시지 핸들러
-
 def handle_topic(update: Update, context: CallbackContext):
     chat_id = update.message.chat_id
     topic = update.message.text
@@ -65,6 +92,8 @@ def handle_topic(update: Update, context: CallbackContext):
 # 핸들러 등록 함수
 def register_handlers(dispatcher):
     dispatcher.add_handler(CommandHandler("start", start))
+    dp.add_handler(CommandHandler("generate", generate))
+    dp.add_handler(CommandHandler("trending", trending))
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_topic))
 
 # 봇 시작 함수

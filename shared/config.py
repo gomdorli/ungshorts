@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+BASE_OUTPUT = os.getenv("OUTPUT_PATH", "/app/output")
+
 # Telegram
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # 봇 토큰
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")    # 알림 받을 채팅 ID
@@ -16,10 +18,10 @@ GOOGLE_SERVICE_ACCOUNT_JSON = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
 SHEETS_ID = os.getenv("SHEETS_ID")
 
 # 경로 설정
-AUDIO_OUTPUT_PATH = os.getenv("AUDIO_OUTPUT_PATH", "output/audio/")
-THUMBNAIL_OUTPUT_PATH = os.getenv("THUMBNAIL_OUTPUT_PATH", "output/thumbnails/")
-VIDEO_OUTPUT_PATH = os.getenv("VIDEO_OUTPUT_PATH", "output/videos/")
-
+AUDIO_OUTPUT_PATH = os.path.join(BASE_OUTPUT, "audio")
+THUMBNAIL_OUTPUT_PATH = os.path.join(BASE_OUTPUT, "thumbnail")
+VIDEO_OUTPUT_PATH = os.path.join(BASE_OUTPUT, "video")
+    
 # 스케줄 타임존
 TIMEZONE = os.getenv("TIMEZONE", "Asia/Seoul")
 

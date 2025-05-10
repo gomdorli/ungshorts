@@ -94,7 +94,7 @@ def register_handlers(dispatcher):
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CommandHandler("generate", generate))
     dispatcher.add_handler(CommandHandler("trending", trending))
-    dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_topic))
+    #dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_topic))
 
 # 봇 시작 함수
 def start_telegram_bot():

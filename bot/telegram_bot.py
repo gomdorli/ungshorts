@@ -92,8 +92,8 @@ def handle_topic(update: Update, context: CallbackContext):
 # 핸들러 등록 함수
 def register_handlers(dispatcher):
     dispatcher.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("generate", generate))
-    dp.add_handler(CommandHandler("trending", trending))
+    dispatcher.add_handler(CommandHandler("generate", generate))
+    dispatcher.add_handler(CommandHandler("trending", trending))
     dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, handle_topic))
 
 # 봇 시작 함수

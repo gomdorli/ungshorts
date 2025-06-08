@@ -13,7 +13,7 @@ def handle_generate(update: Update, context: CallbackContext):
         update.message.reply_text(f"🔍 ‘{topic_input}’ 기반 트렌드 키워드 수집 중...")
         keywords = fetch_related_keywords([topic_input])
         if not keywords:
-            update.message.reply_text("⚠️ Google Trends 실패 → Naver 시도 중...")
+            update.message.reply_text("⚠️ Google Trends 실패 → Zum 시도 중...")
             keywords = fetch_trending_keywords_from_zum()
         if not keywords:
             update.message.reply_text("❌ 키워드를 수집하지 못했습니다.")
@@ -23,7 +23,7 @@ def handle_generate(update: Update, context: CallbackContext):
         update.message.reply_text("📈 트렌드 키워드 자동 수집 중...")
         keywords = fetch_related_keywords()
         if not keywords:
-            update.message.reply_text("⚠️ Google Trends 실패 → Naver 시도 중...")
+            update.message.reply_text("⚠️ Google Trends 실패 → Zum 시도 중...")
             keywords = fetch_trending_keywords_from_zum()
         if not keywords:
             update.message.reply_text("❌ 키워드를 수집하지 못했습니다.")

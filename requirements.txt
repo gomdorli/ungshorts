@@ -8,6 +8,7 @@ python-dotenv
 # 콘텐츠 생성
 requests
 pytrends
+beautifulsoup4
 gtts
 Pillow
 

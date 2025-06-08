@@ -6,8 +6,12 @@ def fetch_trending_keywords_from_naver():
         url = "https://datalab.naver.com/keyword/realtimeList.naver"
         headers = {"User-Agent": "Mozilla/5.0"}
         res = requests.get(url, headers=headers)
-        soup = BeautifulSoup(res.text, "html.parser")
 
+        if res.status_code != 200:
+            print(f"[keyword_fetcher] Naver 요청 실패: {res.status_code}")
+            return []
+
+        soup = BeautifulSoup(res.text, "html.parser")
         ranking_box = soup.select_one("div.ranking_box")
         if not ranking_box:
             print("[keyword_fetcher] Naver 페이지 구조 파싱 실패")

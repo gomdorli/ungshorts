@@ -12,7 +12,10 @@ def fetch_related_keywords(base_keywords=None):
         keywords = []
         for kw in base_keywords:
             top_df = related.get(kw, {}).get("top")
-            if top_df is not None and not top_df.empty:
+            if isinstance(top_df, list) or top_df is None:
+                print(f"[keyword_fetcher] '{kw}' 관련 데이터 없음")
+                continue
+            if not top_df.empty and "query" in top_df.columns:
                 keywords.extend(top_df["query"].tolist())
 
         keywords = list(dict.fromkeys(keywords))

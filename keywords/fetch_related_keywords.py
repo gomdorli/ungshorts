@@ -3,7 +3,7 @@ from pytrends.request import TrendReq
 def fetch_related_keywords(base_keywords=None):
     try:
         if not base_keywords:
-            base_keywords = ["유튜브", "뉴스", "날씨"]
+            base_keywords = ["news", "weather", "tesla", "rivian"]
 
         pytrends = TrendReq(hl='ko', tz=540)
         keywords = []

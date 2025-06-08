@@ -8,13 +8,16 @@ def fetch_trending_keywords_from_naver():
         res = requests.get(url, headers=headers)
         soup = BeautifulSoup(res.text, "html.parser")
 
-        ul = soup.select_one("div.ranking_box > ul")
-        if not ul:
+        ranking_box = soup.select_one("div.ranking_box")
+        if not ranking_box:
             print("[keyword_fetcher] Naver 페이지 구조 파싱 실패")
             return []
 
-        keywords = [li.select_one(".title").get_text(strip=True)
-                    for li in ul.select("li") if li.select_one(".title")]
+        keywords = [
+            tag.get_text(strip=True)
+            for tag in ranking_box.select(".item_title")
+            if tag.get_text(strip=True)
+        ]
 
         print(f"[keyword_fetcher] Naver Trends 성공 - {len(keywords)}개")
         return keywords

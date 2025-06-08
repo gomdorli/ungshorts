@@ -5,13 +5,16 @@ def fetch_related_keywords(base_keywords=None):
         if not base_keywords:
             base_keywords = ["유튜브", "뉴스", "날씨"]
 
+        print(f"[DEBUG] 요청된 base_keywords: {base_keywords}")
         pytrends = TrendReq(hl='ko', tz=540)
         pytrends.build_payload(kw_list=base_keywords)
         related = pytrends.related_queries()
 
         keywords = []
         for kw in base_keywords:
+            print(f"[DEBUG] related.get('{kw}'): {related.get(kw)}")
             top_df = related.get(kw, {}).get("top")
+            print(f"[DEBUG] '{kw}' → top_df: {top_df}")
             if isinstance(top_df, list) or top_df is None:
                 print(f"[keyword_fetcher] '{kw}' 관련 데이터 없음")
                 continue

@@ -3,7 +3,7 @@ import threading
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 
-from fetch_related_keywords import fetch_related_keywords
+from keywords.fetch_related_keywords import fetch_related_keywords
 from keywords.keyword_fetcher import fetch_trending_keywords_from_naver
 from content.content_scraper import scrape_content_for_keywords
 from content.tts_generator import generate_tts_audio

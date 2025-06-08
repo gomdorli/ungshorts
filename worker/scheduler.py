@@ -5,7 +5,7 @@ import pytz
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.base import STATE_RUNNING
 from apscheduler.triggers.cron import CronTrigger
-from keywords.keyword_fetcher import fetch_trending_keywords_from_naver
+from keywords.keyword_fetcher import fetch_trending_keywords_from_zum
 from content.content_scraper import scrape_content_for_keywords
 from content.tts_generator import generate_tts_audio
 from video.thumbnail_generator import create_thumbnail
@@ -24,7 +24,7 @@ scheduler = BackgroundScheduler(timezone=tz)
 # ———————————————————————————————
 
 def automated_workflow():
-    keywords = fetch_trending_keywords_from_naver()
+    keywords = fetch_trending_keywords_from_zum()
     for kw in keywords:
         logger.info(f"Scheduled job: processing '{kw}'...")
         summary = scrape_content_for_keywords(kw)
